@@ -1,0 +1,149 @@
+[
+    {
+        "name": "projectName",
+        "label": "Project Name",
+        "type": "char",
+        "length": 32,
+        "value": "GSM/GP-Tracker",
+        "hidden": true
+    },
+    {
+        "name": "projectVersion",
+        "label": "Projektversion",
+        "type": "char",
+        "length": 32,
+        "value": "V0.01",
+        "hidden": true
+    },
+    {
+        "name": "ShowFilePage",        
+        "type": "bool",
+        "value": false,
+        "hidden": true
+    },
+    {
+        "name": "ShowFileFirmwarePage",        
+        "type": "bool",
+        "value": true,
+        "hidden": true
+    },
+    {
+        "name": "ShowWebFirmwarePage",        
+        "type": "bool",
+        "value": false,
+        "hidden": true
+    },
+    {
+        "name": "ShowDiagnosePage",        
+        "type": "bool",
+        "value": true,
+        "hidden": true
+    },
+    {
+        "name": "language",        
+        "type": "char",
+        "length": 3,
+        "value": "de",
+        "hidden": true
+    },
+    {
+        "type": "header",
+        "text": "Pumpenüberwachung"
+    },
+    {
+        "name": "MaxOnTime",
+        "label": "max Einschaltzeit [Sek]",
+        "type": "uint16_t",
+        "value": 300
+    },
+    {
+        "name": "WarnOnTime",
+        "label": "max Einschaltzeit bis Warnung [Sek]",
+        "type": "uint16_t",
+        "value": 120
+    },
+    {
+        "name": "PumpeStatusEinLevel",
+        "label": "Schwellenwert Pumpe Ein",
+        "type": "uint16_t",
+        "value": 200
+    },
+    {
+        "name": "ZeitCheckInit",        
+        "label": "Ueberwachung nach Neustart Ein",
+        "type": "bool",
+        "value": true
+    },
+    {
+        "type": "separator"
+    },
+    {
+        "type": "header",
+        "text": "Firebase Cloud Verbindung"
+    },
+    {
+        "name": "FirebaseUpdateIntervall",
+        "label": "FirebaseUpdateIntervall [ms]",
+        "type": "uint16_t",
+        "value": 15000
+    },
+    {
+        "name": "PrivateKeyFirst",
+        "label": "1.+2. Zeichen Private Key (MI)",
+        "type": "char",
+        "length": 4,
+        "value": ""
+    },
+    {
+        "name": "ConnectToCloud",        
+        "label": "mit Firebase-Cloud verbinden",
+        "type": "bool",
+        "value": false
+    },
+    {
+        "name": "UseStream",        
+        "label": "benutze Firebase Read-Stream",
+        "type": "bool",
+        "value": false
+    },
+    {
+        "name": "MaxAltdatenTage",
+        "label": "Anzahl Tage fuer Altdaten (330) [Tage]",
+        "type": "uint16_t",
+        "value": 330
+    },
+    {
+        "type": "separator"
+    },
+    {
+        "name": "FirmwareURL",
+        "label": "Firmware URL  (http://www...",
+        "type": "char",
+        "length": 60,
+        "value": "http://www.bierhoehle.de/pumpe.bin"
+    },
+    {
+        "name": "Messagelevel",
+        "label": "Meldungsfilter",
+        "type": "uint16_t",
+        "value": 2,
+        "control": "select",
+        "options": [
+            {"Label":"Fehler+Meldungen","Value":2},
+            {"Label":"nur Fehler","Value":1}
+        ]
+    },    
+    {
+        "type": "separator"
+    },
+    {
+        "type": "header",
+        "text": "Temperaturlogger"        
+    },
+    {
+        "name": "TemperaturEnable",        
+        "label": "Temperatur Sensor aktivieren",
+        "type": "bool",
+        "value": true
+    }
+]

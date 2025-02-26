@@ -1,0 +1,93 @@
+[
+    {
+        "name": "aktuelleLaufzeit",
+        "label": "aktuelle Laufzeit [Sek]",
+        "type": "uint16_t",
+        "direction": "display"
+    },
+    {
+        "name": "Temperatur",
+        "label": "Temperatur [C]",
+        "type": "float",
+        "digits": 1,
+        "direction": "display"
+    },
+    {
+        "name": "Pumpenzustand",
+        "type": "bool",
+        "texttrue": "Ein",
+        "textfalse": "Aus",
+        "styletrue": "true",
+        "stylefalse": "gray",
+        "direction": "display"
+    },
+    {
+        "name": "PumpenAbschaltError",
+        "label": "Pumpenueberwachung",
+        "type": "bool",
+        "texttrue": "Pumpe gesperrt",
+        "textfalse": "Pumpe freigegeben",
+        "styletrue": "red",
+        "stylefalse": "green",
+        "direction": "display"
+    },
+    {
+        "name": "RuntimeMonitor",
+        "label": "Laufzeitueberwachung aktivieren",
+        "type": "bool",
+        "direction": "control",
+        "display": "switch"
+    },
+    {
+        "name": "Testschalter",
+        "label": "Simulation",
+        "type": "bool",
+        "hidden":false,
+        "direction": "control",
+        "display": "switch"
+    },
+    {
+        "name": "QueryTest",
+        "label": "Firebase Query Test",
+        "type": "bool",
+        "hidden":true,
+        "direction": "control",
+        "display": "switch"
+    },
+    {
+        "name": "MessageTest",
+        "label": "Testnachricht senden",
+        "type": "bool",
+        "hidden":false,
+        "direction": "control",
+        "buttontextOn": "Senden",
+        "display": "button"
+    },
+    {
+        "name": "AltdatenLoeschen",
+        "label": "Altdaten aufraeumen",
+        "type": "bool",
+        "hidden":true,
+        "direction": "control",
+        "buttontextOn": "Aufraeumen",
+        "display": "button"
+    },
+    {
+        "name": "AnzeigeinMin",
+        "label": "Anzeige",
+        "type": "uint16_t",
+        "direction": "control",
+        "control": "select",
+        "options": [
+            {"Label":"Grafik zeigt Schaltzyklen","Value":0},
+            {"Label":"Grafik zeigt Laufzeit [Sek]","Value":1}
+        ]
+    },
+    {
+        "name": "Laufzeitverhalten",
+        "type": "historic",
+        "direction": "display",
+        "alignment": "vertical",
+        "display": "barchart"
+    }
+]
