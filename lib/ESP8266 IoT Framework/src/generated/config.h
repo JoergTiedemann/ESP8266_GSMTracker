@@ -21,7 +21,6 @@ struct configData
 	uint16_t MaxAltdatenTage;
 	char FirmwareURL[60];
 	uint16_t Messagelevel;
-	bool TemperaturEnable;
 };
 
 extern uint32_t configVersion;

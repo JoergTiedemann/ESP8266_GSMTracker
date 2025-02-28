@@ -52,7 +52,8 @@ void CBoardsInformation::PrintBoardInformation()
 void CBoardsInformation::print_used_libraries() {
     Serial.println(F("***************************************************"));
     Serial.printf("SDK Version:%s\n",ESP.getSdkVersion());
-    Serial.printf("Framework_Adruino_Espressif32:%d.%d.%d\n", esp8266::coreVersionMajor(), esp8266::coreVersionMinor(),esp8266::coreVersionRevision());
+    Serial.printf("Core Version:%s\n",ESP.getCoreVersion().c_str());
+    Serial.printf("Framework_Adruino_Espressif8266:%d.%d.%d\n", esp8266::coreVersionMajor(), esp8266::coreVersionMinor(),esp8266::coreVersionRevision());
     Serial.printf("Platform:%s\n",PIO_PLATFORM_VERSION);
     Serial.println(F("Verwendete Libraries (PLATFORMIO_USED_LIBRARIES)"));
     // Serial.printf("SDK Version lowlevel:%s\n",esp_get_idf_version());
