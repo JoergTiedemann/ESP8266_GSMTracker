@@ -179,10 +179,10 @@ void webServer::bindAll()
         // OTAManager.m_bDoUpdate = true;
     });
 
-
     //get file listing
     server.on(PSTR("/api/files/get"), HTTP_GET, [](AsyncWebServerRequest *request) {
 
+        // Serial.printf("/api/files/get Abfrage FileListing\n");
         String JSON;
         FirebaseJson  jsonBuffer;
         FirebaseJsonArray files;// = jsonBuffer.createNestedArray("files");
@@ -230,6 +230,7 @@ void webServer::bindAll()
 #endif
         jsonBuffer.add("files",files);
         JSON = jsonBuffer.raw();
+        // Serial.printf("JSON:%s\n",JSON.c_str());
         // serializeJson(jsonBuffer, JSON);
 
 #ifdef ESP32

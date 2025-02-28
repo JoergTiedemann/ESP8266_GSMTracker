@@ -4,7 +4,7 @@
         "label": "Project Name",
         "type": "char",
         "length": 32,
-        "value": "GSM/GP-Tracker",
+        "value": "GSM/GPS-Tracker",
         "hidden": true
     },
     {
@@ -12,7 +12,7 @@
         "label": "Projektversion",
         "type": "char",
         "length": 32,
-        "value": "V0.01",
+        "value": "V0.02",
         "hidden": true
     },
     {
@@ -48,7 +48,7 @@
     },
     {
         "type": "header",
-        "text": "Pumpenüberwachung"
+        "text": "Configüberschrift"
     },
     {
         "name": "MaxOnTime",
@@ -79,7 +79,7 @@
     },
     {
         "type": "header",
-        "text": "Firebase Cloud Verbindung"
+        "text": "2. Überschrift"
     },
     {
         "name": "FirebaseUpdateIntervall",
@@ -120,7 +120,7 @@
         "label": "Firmware URL  (http://www...",
         "type": "char",
         "length": 60,
-        "value": "http://www.bierhoehle.de/pumpe.bin"
+        "value": "http://www.bierhoehle.de/gsmtracker.bin"
     },
     {
         "name": "Messagelevel",
@@ -135,15 +135,5 @@
     },    
     {
         "type": "separator"
-    },
-    {
-        "type": "header",
-        "text": "Temperaturlogger"        
-    },
-    {
-        "name": "TemperaturEnable",        
-        "label": "Temperatur Sensor aktivieren",
-        "type": "bool",
-        "value": true
     }
 ]
