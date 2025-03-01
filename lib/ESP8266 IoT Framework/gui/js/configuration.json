@@ -12,7 +12,7 @@
         "label": "Projektversion",
         "type": "char",
         "length": 32,
-        "value": "V0.02",
+        "value": "V1.00",
         "hidden": true
     },
     {

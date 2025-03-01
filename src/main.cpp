@@ -24,22 +24,15 @@
 #include "BoardsInformation.h"
 // #include "OTAManager.h"
 
-#define D13 13
-#define A0 36
 
 char buffer [80];
 
-float f1 = 3.145268;
-int i1 = 123;
-String s1("ABC die Katze");
 String strTime("No Time");
 String strBootTime("");
 
 uint32_t m_FreeHeap =0;
 bool b1 = false;
-bool bShownRuntimemonitor = false;
 struct tm * timeinfo = NULL;
-int m_DashStartzeit = 0;
 time_t now = 0;
 
 struct task
@@ -60,16 +53,14 @@ void saveCallback() {
 void setup() 
 {
     Serial.begin(115200);
-    pinMode(D13,OUTPUT);
     BoardInformation.PrintBoardInformation();
     BoardInformation.print_used_libraries();
 
 
     LittleFS.begin();
-    // updater.begin();
     configManager.begin();
     configManager.setConfigSaveCallback(saveCallback);
-    WiFiManager.begin(configManager.data.projectName);//,240000);
+    WiFiManager.begin(configManager.data.projectName,240000);
     GUI.begin(BoardInformation.SendLibraryVersion);
 
     DiagManager.begin(20,10);
@@ -89,7 +80,6 @@ void setup()
             timeSync.begin(TZ_Europe_Berlin);
         #endif
 
-
         #ifdef ESP32
             // use asctime to serialize local time to string
             now = time(nullptr);
@@ -100,7 +90,6 @@ void setup()
             strTime = String(buffer);
             Serial.print(PSTR("Current time in Berlin: "));
             Serial.println(strTime);
-        
         #elif defined(ESP8266)
             //Wait for connection
             timeSync.waitForSyncResult(10000);
@@ -115,7 +104,6 @@ void setup()
             {
                 Serial.println("Timeout while receiving the time");
             }
-
         #endif
     }
     dash.begin(500);
@@ -184,12 +172,7 @@ void loop()
     updater.loop();
     dash.loop();
     configManager.loop();
-    // if (OTAManager.m_bDoUpdate)
-    // {
-    //     OTAManager.DoOTAUpdate(configManager.data.FirmwareURL);
-    // }
 
-        //your code here
     //your code here
     //task A
     if (taskA.previous == 0 || (millis() - taskA.previous > taskA.rate))
@@ -197,12 +180,8 @@ void loop()
         taskA.previous = millis();
         if (dash.data.Pumpenzustand)
         {
-   	        dash.data.aktuelleLaufzeit = millis() / 1000 - m_DashStartzeit;
+   	        dash.data.aktuelleLaufzeit = millis() / 1000;
         }
-  
-        // haben wir was zum protokollieren weil das Aufzeichnungsintervall gewechselt hat
-        // digitalWrite(D13,dash.data.PumpenAbschaltError);
-
         dash.data.Temperatur = -999;
     }
 }

@@ -1,12 +1,12 @@
 #include <Arduino.h>
 #include "config.h"
 
-uint32_t configVersion = 3254419057; //generated identifier to compare config with EEPROM
+uint32_t configVersion = 1726078555; //generated identifier to compare config with EEPROM
 
 const configData defaults PROGMEM =
 {
 	"GSM/GPS-Tracker",
-	"V0.02",
+	"V1.00",
 	false,
 	true,
 	false,
