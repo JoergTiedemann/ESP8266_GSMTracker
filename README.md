@@ -2,12 +2,11 @@
 ESP8266 Projekt fuer einen GPS Tracker mit GSM Benachrichtigung
 
 ## HW-Platform
-Das Ding läuft auf einer ESP8266 D1_Mini Development Plattform, d.h. alles was D1Mini Devices sind  o.ä. (z.B. Wemos D1 Mini)
-ist, 
+Das Ding läuft auf einer ESP8266 D1_Mini Development Plattform, d.h. alles was D1Mini Devices sind o.ä. (z.B. Wemos D1 Mini)
 
 ## Installation
 Es muss in jedem Fall node.js installiert sein, sonst koennen die NPM Module nicht installiert werden 
-Nach dem Download bzw. Clonen des Repos im Verzeichnis lib/ESP32 IOT Framework
+Nach dem Download bzw. Clonen des Repos im Verzeichnis lib/ESP8266 IOT Framework
 einen cmd Prompt holen und 1) npm init -f und dann 2) npm ci eingeben damit die Node Module geladen werden  
 evtl. muss noch npm install eingegeben werden wenn npm ci einen Fehler wirft  
 
@@ -19,12 +18,11 @@ git add -f <relativer Pfad vom Projektroot auf bin und elf Datei>
 ins git repo aufgenommen worden
 
 ## Compilieren
-Nach dem Compilieren steht im Verzeichnis .pio\Build\ES32dev die Datei firmware.bin 
-zur Verfügung mit die dann geflasht werden kann
+Nach dem Compilieren steht im Verzeichnis .pio\Build\d1_mini  die Datei gsmtracker.bin (wird in preFirmwareVersion.py eingestellt) zur Verfügung mit die dann geflasht werden kann
 Aktuell belegt dieses Image den Speicher wie folgt:
 ```
-RAM:   [==        ]  15.9% (used 52032 bytes from 327680 bytes)
-Flash: [=======   ]  72.2% (used 1418661 bytes from 1966080 bytes)
+RAM:   [====      ]  41.4% (used 33948 bytes from 81920 bytes)
+Flash: [=====     ]  52.1% (used 544173 bytes from 1044464 bytes)
 ```
 
 # iot Framework by MaakBaas
@@ -65,7 +63,7 @@ Damit ist dann sichergestellt das der Standardimport von react verwendet werden 
 ### Fehler bei HTML Erzeugung
 In der Configdatei für webpack ``webpack.config.js``ist auch noch ein Kommentar was bei Fehlern bei der HTML Erzeugung gemacht werden kann
 ```
-    // Wenn die Compilierug / Erzeugung der HTML Seite durch webpack  fehlschlaegt, dann in der consol npm run dev aufrufen und im Browser dann die URL http://localhost:8080/index.html aufrufen
+    // Wenn die Compilierug / Erzeugung der HTML Seite durch webpack  fehlschlaegt, dann in der console npm run dev aufrufen und im Browser dann die URL http://localhost:8080/index.html aufrufen
     // n der Console wird dann angegeben was schief gelaufen ist und wo der Fehler in den JS Scripten liegt
     // die ganzen benoetigten Node.js module werden  in der windows console (cmd) mit npm ci installiert und zwar aus dem Verzeichnis ESP8266 iot Framework
     // die Nachfolgende Zeile kann fuer diesen zweck auskommentiert werden um evtl. noch weitere Infos zu erhalten
@@ -73,7 +71,9 @@ In der Configdatei für webpack ``webpack.config.js``ist auch noch ein Kommentar
 
 ```
 ## Updaten von node Komponenten
-Im Verzeichnis ``lib\ESP32 IoT Framework\node_modules`` kann nganz normal ein Commandprompt geholt werden und über npm die node.js Komponenten gemanaget werden um z.B. über ``npm list <packagename>`` die aktuell installierte Komponenten anzuzeigen oder ``npm update <packagename>`` upzudaten oder über ``npm view <packagename>`` sich die letzte verfügbare aktuelle Version anzuzeigen  
-
+Im Verzeichnis ``lib\ESP8266 IoT Framework\node_modules`` kann nganz normal ein Commandprompt geholt werden und über npm die node.js Komponenten gemanaget werden um z.B. über ``npm list <packagename>`` die aktuell installierte Komponenten anzuzeigen oder ``npm update <packagename>`` upzudaten oder über ``npm view <packagename>`` sich die letzte verfügbare aktuelle Version anzuzeigen  
+ACTUNG: react-vis muss die Version 11.11.7 sein, die andere (1.12.x) funktioniert nicht richtig und ist inkompatibel.  
+Das wird in der package.jspon angegeben
 # Funktion GPS Tracker 
-hier geht es weiter
+Die Version 1.0 ist ein nacktes System ohne Funktion in dem nur der Webserver mit dem maakbas IOT Framework gestartet wird
+Damit hat man dann erstmal alles was man braucht um mit einem leeren System mit Webservergrundfunktion loszulegen
