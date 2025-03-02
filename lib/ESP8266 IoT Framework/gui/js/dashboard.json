@@ -1,5 +1,29 @@
 [
     {
+        "name": "ModulQuery",
+        "label": "Modul abfragen",
+        "type": "bool",
+        "direction": "control",
+        "buttontextOn": "Abfragen",
+        "display": "button"
+    },
+    {
+        "name": "SendSMS",
+        "label": "SMS Senden",
+        "type": "bool",
+        "direction": "control",
+        "buttontextOn": "Senden",
+        "display": "button"
+    },
+    {
+        "name": "CheckSMS",
+        "label": "SMS prüfen",
+        "type": "bool",
+        "direction": "control",
+        "buttontextOn": "Prüfen",
+        "display": "button"
+    },
+    {
         "name": "aktuelleLaufzeit",
         "label": "aktuelle Laufzeit [Sek]",
         "type": "uint16_t",

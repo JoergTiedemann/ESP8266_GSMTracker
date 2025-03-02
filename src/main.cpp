@@ -3,7 +3,6 @@
 #include "FS.h"
 #include <LittleFS.h>
 
-
 // #ifdef ESP32
 //     #include "LITTLEFS.h"   // https://github.com/lorol/LITTLEFS/tree/master/examples/LITTLEFS_PlatformIO
 //     #define LittleFS LITTLEFS
@@ -22,7 +21,15 @@
 #include "dashboard.h"
 #include "DiagManager.h"
 #include "BoardsInformation.h"
-// #include "OTAManager.h"
+
+#include <Sim800L.h>
+#include <SoftwareSerial.h>               
+
+#define RX  14 //D5
+#define TX  12 // D6
+#define LED_PIN 2 // D4 ist GPIO 2
+
+Sim800L GSM(RX, TX);
 
 
 char buffer [80];
@@ -119,7 +126,28 @@ void setup()
     // DiagManager.AddVariableToMonitor(6,String("PumpeIsRunning"),&m_PumpeIsRunning);
     // DiagManager.AddVariableToMonitor(8,String("ComboMode"),&dash.data.mode);
     // DiagManager.AddVariableToMonitor(9,String("CfgTestCombo"),&configManager.data.TestCombo);
-   
+    pinMode(LED_PIN, OUTPUT); // LED-Pin als Ausgang setzen
+    digitalWrite(LED_PIN, HIGH); // LED ausschalten
+
+    GSM.begin(9600);     
+
+    Serial.println("GET PRODUCT INFO: ");
+    Serial.println(GSM.getProductInfo());
+  
+    Serial.println("GET OPERATORS LIST: ");
+    Serial.println(GSM.getOperatorsList());
+  
+    Serial.println("GET OPERATOR: ");
+    Serial.println(GSM.getOperator());
+
+    Serial.println("Del Old SMS");
+    GSM.delAllSms(); // this is optional
+    // while(!GSM.prepareForSmsReceive())
+    // {
+    //   delay(1000);
+    // }
+    Serial.println("ready");
+
 }
 
 /*
@@ -184,6 +212,54 @@ void loop()
         }
         dash.data.Temperatur = -999;
     }
+
+    if (dash.data.ModulQuery)
+    {
+        digitalWrite(LED_PIN, LOW); // LED einschalten
+        dash.data.ModulQuery = false;
+        Serial.println("GET OPERATOR: ");
+        Serial.println(GSM.getOperator());
+        Serial.println("GET PRODUCT INFO: ");
+        Serial.println(GSM.getProductInfo());
+        digitalWrite(LED_PIN, HIGH); // LED ausschalten
+    }
+
+    if (dash.data.SendSMS)
+    {
+        digitalWrite(LED_PIN, LOW); // LED einschalten
+        Serial.printf("SMS Senden:%s\n",configManager.data.SMSText);
+        dash.data.SendSMS = false;
+        bool error = false; 					//to catch the response of sendSms
+        error=GSM.sendSms(configManager.data.DialNumber,configManager.data.SMSText);
+        Serial.printf("SendenSMS:%d\n",error);
+        digitalWrite(LED_PIN, HIGH); // LED ausschalten
+
+    }
+
+    if (dash.data.CheckSMS)
+    {
+        Serial.printf("Eingegange SMS prüfen\n");
+        dash.data.CheckSMS = false;
+        byte index = GSM.checkForSMS();
+        if(index != 0)
+        {
+            Serial.printf("SMS Empfangen an Index:%d\n",index);
+            digitalWrite(LED_PIN, LOW); // LED einschalten
+            // textSms=GSM.readSms(1); //read the first sms
+    
+            // if (textSms.indexOf("OK")!=-1) //first we need to know if the messege is correct. NOT an ERROR
+        
+            String smstext = GSM.readSms(index);
+            Serial.println("Native:"+smstext);
+            String textSms=GSM.readSms(1); //read the first sms
+            Serial.println("Native1:"+textSms);
+
+            Serial.printf("Empfangene SMS:%s\n",smstext.c_str());
+            DiagManager.PushDiagData(msgAll,smstext);
+            // GSM.delAllSms(); // this is optional
+            digitalWrite(LED_PIN, HIGH); // LED ausschalten
+        }
+      }
 }
 
   

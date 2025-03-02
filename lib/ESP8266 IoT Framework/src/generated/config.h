@@ -10,8 +10,8 @@ struct configData
 	bool ShowWebFirmwarePage;
 	bool ShowDiagnosePage;
 	char language[3];
-	uint16_t MaxOnTime;
-	uint16_t WarnOnTime;
+	char DialNumber[20];
+	char SMSText[40];
 	uint16_t PumpeStatusEinLevel;
 	bool ZeitCheckInit;
 	uint16_t FirebaseUpdateIntervall;

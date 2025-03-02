@@ -3,6 +3,9 @@
 
 struct dashboardData
 {
+	bool ModulQuery;
+	bool SendSMS;
+	bool CheckSMS;
 	uint16_t aktuelleLaufzeit;
 	float Temperatur;
 	bool Pumpenzustand;
