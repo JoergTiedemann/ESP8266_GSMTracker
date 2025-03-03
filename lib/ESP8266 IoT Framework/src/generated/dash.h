@@ -6,6 +6,7 @@ struct dashboardData
 	bool ModulQuery;
 	bool SendSMS;
 	bool CheckSMS;
+	bool DeleteSMS;
 	uint16_t aktuelleLaufzeit;
 	float Temperatur;
 	bool Pumpenzustand;

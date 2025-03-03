@@ -74,6 +74,9 @@
 #define DEFAULT_BAUD_RATE		9600
 #define TIME_OUT_READ_SERIAL	5000
 
+#define cNoDebug 0
+#define cSeriellDebug  1
+
 class Sim800L : public SoftwareSerial
 {
 private:
@@ -83,6 +86,8 @@ private:
     String _buffer;
     bool _sleepMode;
     uint8_t _functionalityMode;
+    int m_Debuglevel;
+
     String _locationCode;
     String _longitude;
     String _latitude;
@@ -133,6 +138,9 @@ public:
     bool sendSms(char* number,char* text);
     String readSms(uint8_t index);
     String getNumberSms(uint8_t index);
+    String getNumberSmsFromBuffer();
+    String getSmDateFromBuffer();
+
     bool delAllSms();
 
 
@@ -145,7 +153,25 @@ public:
     void RTCtime(int *day,int *month, int *year,int *hour,int *minute, int *second);
     String dateNet();
     bool updateRtc(int utc);
+    void sendATCommand(String strATcmd);
+    void setDebugLevel(int level);
+    // auslesen der seriellen Schnittstelle fom GSM Modem
+    String ReadGSMData();
+    bool WaitForOk(String& str,uint64_t timeout = 5000);
 
+
+    size_t printSerial(const __FlashStringHelper *ifsh);
+    size_t printSerial(const String &s);
+    size_t printSerial(const char str[]);
+    size_t printSerial(char c);
+    size_t printSerial(unsigned char b, int base);
+    size_t printSerial(int n, int base);
+    size_t printSerial(unsigned int n, int base);
+    size_t printSerial(long n, int base);
+    size_t printSerial(unsigned long n, int base);
+    size_t printSerial(long long n, int base);
+    size_t printSerial(unsigned long long n, int base);
+    size_t printSerial(double n, int digits);
+    size_t printSerial(const Printable& x);    
 };
-
 #endif

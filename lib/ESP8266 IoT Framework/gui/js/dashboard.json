@@ -24,6 +24,14 @@
         "display": "button"
     },
     {
+        "name": "DeleteSMS",
+        "label": "SMS auf Karte löschen",
+        "type": "bool",
+        "direction": "control",
+        "buttontextOn": "Löschen",
+        "display": "button"
+    },
+    {
         "name": "aktuelleLaufzeit",
         "label": "aktuelle Laufzeit [Sek]",
         "type": "uint16_t",
