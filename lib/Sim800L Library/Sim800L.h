@@ -84,6 +84,7 @@ private:
     uint32_t _baud;
     int _timeout;
     String _buffer;
+    String m_GSMDataBuffer;
     bool _sleepMode;
     uint8_t _functionalityMode;
     int m_Debuglevel;
@@ -156,8 +157,9 @@ public:
     void sendATCommand(String strATcmd);
     void setDebugLevel(int level);
     // auslesen der seriellen Schnittstelle fom GSM Modem
-    String ReadGSMData();
+    void ReadGSMData();
     bool WaitForOk(String& str,uint64_t timeout = 5000);
+    void EnableEinbuchungsmessage(bool bEnable);
 
 
     size_t printSerial(const __FlashStringHelper *ifsh);

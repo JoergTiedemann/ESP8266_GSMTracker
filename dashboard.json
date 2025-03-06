@@ -32,17 +32,39 @@
         "display": "button"
     },
     {
-        "name": "aktuelleLaufzeit",
-        "label": "aktuelle Laufzeit [Sek]",
-        "type": "uint16_t",
+        "name": "Operator",
+        "label": "Netzbetreiber",
+        "type": "char",
+        "length": 20,
         "direction": "display"
     },
     {
-        "name": "Temperatur",
-        "label": "Temperatur [C]",
+        "name": "SignalStrength",
+        "label": "Signalstärke [dBm]",
+        "type": "char",
+        "length": 30,
+        "direction": "display"
+    },
+    {
+        "name": "BatteryVoltage",
+        "label": "Batterieladung [V]",
+        "type": "float",
+        "digits": 2,
+        "direction": "display"
+    },
+    {
+        "name": "Capacity",
+        "label": "Kapazität [%]",
         "type": "float",
         "digits": 1,
         "direction": "display"
+    },
+    {
+        "name": "SleepMode",
+        "label": "Stromsparmodus",
+        "type": "bool",
+        "direction": "control",
+        "display": "switch"
     },
     {
         "name": "Pumpenzustand",
@@ -62,13 +84,6 @@
         "styletrue": "red",
         "stylefalse": "green",
         "direction": "display"
-    },
-    {
-        "name": "RuntimeMonitor",
-        "label": "Laufzeitueberwachung aktivieren",
-        "type": "bool",
-        "direction": "control",
-        "display": "switch"
     },
     {
         "name": "Testschalter",

@@ -113,6 +113,7 @@ void Sim800L::begin()
 {
 
     pinMode(RESET_PIN, OUTPUT);
+    m_GSMDataBuffer = "";
 
     _baud = DEFAULT_BAUD_RATE;			// Default baud rate 9600
     this->SoftwareSerial::begin(_baud);
@@ -144,21 +145,30 @@ void Sim800L::begin(uint32_t baud)
 
 /*
  * AT+CSCLK=0	Disable slow clock, module will not enter sleep mode.
- * AT+CSCLK=1	Enable slow clock, it is controlled by DTR. When DTR is high, module can enter sleep mode. When DTR changes to low level, module can quit sleep mode
+ * AT+CSCLK="	Enable slow clock after 5 seconds
  */
 bool Sim800L::setSleepMode(bool state)
 {
 
     _sleepMode = state;
+    _buffer ="";
 
-    if (_sleepMode) printSerial(F("AT+CSCLK=1\r\n "));
-    else 			printSerial(F("AT+CSCLK=0\r\n "));
-
-    if ( (_readSerial().indexOf("ER")) == -1)
+    if (_sleepMode)
     {
-        return false;
+        printSerial(F("AT+CSCLK=2\r"));
     }
-    else return true;
+    else
+    {
+        printSerial(F("A"));// um das GSM Modul aufzuwecken
+        delay(500);
+        printSerial(F("AT+CSCLK=0\r"));// um den Sleepmode auszuschalten
+    }
+    _buffer ="";
+    WaitForOk(_buffer);
+    if ( (_buffer.indexOf("OK")) == -1)
+        return false;
+    else 
+        return true;
     // Error found, return 1
     // Error NOT found, return 0
 }
@@ -184,13 +194,13 @@ bool Sim800L::setFunctionalityMode(uint8_t fun)
         switch(_functionalityMode)
         {
         case 0:
-            printSerial(F("AT+CFUN=0\r\n "));
+            printSerial(F("AT+CFUN=0\r"));
             break;
         case 1:
-            printSerial(F("AT+CFUN=1\r\n "));
+            printSerial(F("AT+CFUN=1\r"));
             break;
         case 4:
-            printSerial(F("AT+CFUN=4\r\n "));
+            printSerial(F("AT+CFUN=4\r"));
             break;
         }
 
@@ -249,13 +259,52 @@ String Sim800L::getOperatorsList()
     return (_buffer);
 }
 
+void Sim800L::EnableEinbuchungsmessage(bool bEnable)
+{
+    if (bEnable)
+       printSerial("AT+CREG=1\r");// Meldung bei Änderung des Nestzwerkstatus in Fora +CREG: x
+    else
+        printSerial("AT+CREG=0\r");// KEINE Meldung bei Änderung des Nestzwerkstatus in Fora +CREG: x
+    WaitForOk(_buffer);
+}
+
+
 String Sim800L::getOperator()
 {
-
-    printSerial("AT+COPS ?\r");
+    printSerial("AT+CREG?\r");
     _buffer = "";
     WaitForOk(_buffer);
-    return (_buffer);
+    bool bInNetzEingebucht = false;
+    if (_buffer.indexOf("+CREG:") != -1)
+    {
+        if (_buffer.substring(_buffer.indexOf(",")).indexOf("1") != -1)
+        {
+            bInNetzEingebucht = true;
+            printSerial("AT+COPS?\r");
+            _buffer = "";
+            WaitForOk(_buffer);
+            if (_buffer.indexOf("+COPS:") != -1)
+            {
+                uint8_t start=_buffer.indexOf(",");//1. Komma
+                start=_buffer.indexOf(",",start+1);//2. Komma
+                uint8_t end=_buffer.indexOf("\"",start+2);
+                // Serial.printf("Operator: Id:%d End:%d Operator:%s\n",start,end, _buffer.substring(start+2,end));
+                return _buffer.substring(start+2,end);
+            } 
+            else
+            {
+                return "No Operator";
+            }
+        }
+        else
+        {
+            return "kein Netz";
+        }
+    }
+    else
+    {
+        return "No Module";
+    }
 }
 
 
@@ -269,7 +318,7 @@ bool Sim800L::calculateLocation()
     uint8_t type = 1;
     uint8_t cid = 1;
 	
-	String tmp = "AT+CIPGSMLOC=" + String(type) + "," + String(cid) + "\r\n";
+	String tmp = "AT+CIPGSMLOC=" + String(type) + "," + String(cid) + "\r";
 	printSerial(tmp);
 	
 	/*
@@ -390,10 +439,37 @@ String Sim800L::signalQuality()
     subclause 7.2.4
     99 Not known or not detectable
     */
-   printSerial (F("AT+CSQ\r\n"));
+   printSerial (F("AT+CSQ\r"));
    _buffer = "";
    WaitForOk(_buffer);
-   return(_buffer);
+   String rssi = "";
+   if (_buffer.indexOf("+CSQ:") != -1)
+   {
+       String rssi = _buffer.substring(_buffer.indexOf("+CSQ:")+5,_buffer.indexOf(","));
+       Serial.printf("Signalstärke:%s\n",rssi.c_str());
+       if (rssi.indexOf(" 0") != -1)
+       {
+           return "sehr schlecht";
+       }
+       if (rssi==(" 1") )
+       {
+           return "schlecht";
+       }
+       if (rssi.indexOf(" 31") != -1)
+       {
+           return "sehr gut";
+       }
+       if (rssi.indexOf(" 99") != -1)
+       {
+           return "unbekannt";
+       }
+       long lrssi = rssi.toInt();
+       if (lrssi < 15)
+           return "mittel";
+       else 
+           return "gut";
+    }
+   return(rssi);
 }
 
 
@@ -518,14 +594,14 @@ bool Sim800L::prepareForSmsReceive()
 	printSerial(F("AT+CMGF=1\r"));
     _buffer=_readSerial();
     WaitForOk(_buffer);
-    Serial.print("prepareForSmsReceive1:"+_buffer+"<-");
+    // Serial.print("prepareForSmsReceive1:"+_buffer+"<-");
     if((_buffer.indexOf("OK")) == -1)
     {
         return false;
     }
 	printSerial(F("AT+CNMI=2,1,0,0,0\r"));
     _buffer=_readSerial();
-    Serial.print("prepareForSmsReceive2:"+_buffer+"<-");
+    // Serial.print("prepareForSmsReceive2:"+_buffer+"<-");
     //Serial.print(_buffer);
     if (WaitForOk(_buffer))
        return true;
@@ -553,7 +629,6 @@ bool Sim800L::WaitForOk(String& str,uint64_t timeout)
 const uint8_t Sim800L::checkForSMS()
 {
 	printSerial(F("AT+CMGL=\"ALL\"\r"));
-
     _buffer = _readSerial(100);
 	 if(_buffer.length() == 0)
 	 {
@@ -565,7 +640,7 @@ const uint8_t Sim800L::checkForSMS()
     //Noch ein Test
     // wir waren bis wir das OK eingelesen haben
     WaitForOk(_buffer);
-	Serial.println("CheckforSMS:"+_buffer);
+	// Serial.println("CheckforSMS:"+_buffer);
     if(_buffer.indexOf("CMGL") == -1)
 	{
 	    return 0;
@@ -573,7 +648,7 @@ const uint8_t Sim800L::checkForSMS()
     long startIndex = _buffer.indexOf("CMGL:");
     long endIndex = _buffer.indexOf(',');
 
-    Serial.println("SMSIndex:"+_buffer.substring(startIndex+5,endIndex));
+    // Serial.println("SMSIndex:"+_buffer.substring(startIndex+5,endIndex));
 	return _buffer.substring(startIndex+5,endIndex).toInt();
 }
 
@@ -766,12 +841,41 @@ bool Sim800L::updateRtc(int utc)
 
 
 // auslesen der seriellen Schnittstelle fom GSM Modem
-String Sim800L::ReadGSMData()
+void Sim800L::ReadGSMData()
 {
-    if (this->SoftwareSerial::available())
-        return _readSerial();
-    else
-        return "";
+    
+    while (this->SoftwareSerial::available())
+    {
+        m_GSMDataBuffer +=  _readSerial();
+        // Zeilenende gefunden  ?
+        if ((m_GSMDataBuffer.indexOf("\r")) != -1)
+            break;
+    }
+    if ((m_GSMDataBuffer.indexOf("\r")) != -1)
+    {   
+        // das CR Zeichen wollen wir nicht mit im Datenstring haben
+        m_GSMDataBuffer = m_GSMDataBuffer.substring(0,m_GSMDataBuffer.indexOf("\r"));
+        Serial.println("GSMDataBuffer:"+m_GSMDataBuffer+"<-");
+        if (m_GSMDataBuffer.indexOf("RING") != -1)
+        {
+            Serial.println("eingehender Anruf");
+            m_GSMDataBuffer = "";
+        }
+        else if (m_GSMDataBuffer.indexOf("CMTI") != -1)
+        {
+            Serial.println("SMS eingetroffen");
+            m_GSMDataBuffer = "";
+        }
+        else if (m_GSMDataBuffer.indexOf("CREG") != -1)
+        {
+            Serial.println("Netzregistierung");
+            m_GSMDataBuffer = "";
+        }
+        else         {
+            Serial.println("unbekannt !");
+            m_GSMDataBuffer = "";
+        }
+    }
 }
 
 

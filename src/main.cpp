@@ -36,6 +36,9 @@ char buffer [80];
 
 String strTime("No Time");
 String strBootTime("");
+String m_strOperator = "No Operator";
+String m_strSignalQuality = "";
+
 
 uint32_t m_FreeHeap =0;
 bool b1 = false;
@@ -115,8 +118,6 @@ void setup()
     }
     dash.begin(500);
     // OTAManager.begin();
-    //ueberwachung immer einschalten nach Neustart -> nein wollen wir erstmal nicht
-    dash.data.RuntimeMonitor = configManager.data.ZeitCheckInit;
 
     DiagManager.AddVariableToMonitor(0,String("Letzter Systemstart"),&strBootTime);
     DiagManager.AddVariableToMonitor(2,String("Sytemzeit"),&strTime);
@@ -126,20 +127,27 @@ void setup()
     // DiagManager.AddVariableToMonitor(6,String("PumpeIsRunning"),&m_PumpeIsRunning);
     // DiagManager.AddVariableToMonitor(8,String("ComboMode"),&dash.data.mode);
     // DiagManager.AddVariableToMonitor(9,String("CfgTestCombo"),&configManager.data.TestCombo);
+
+    m_strOperator.toCharArray(dash.data.Operator,20);
+
     pinMode(LED_PIN, OUTPUT); // LED-Pin als Ausgang setzen
     digitalWrite(LED_PIN, HIGH); // LED ausschalten
 
     GSM.begin(9600);
-    GSM.setDebugLevel(cSeriellDebug);     
+    // GSM.setDebugLevel(cSeriellDebug);     
     // Echo ausschalten
     Serial.println("Echo ausschalten: ATE0");
     GSM.sendATCommand("ATE0");
+    GSM.EnableEinbuchungsmessage(true);
 
     Serial.println("GET PRODUCT INFO: ");
     Serial.println(GSM.getProductInfo());
   
+
+    m_strOperator = GSM.getOperator();
+    m_strOperator.toCharArray(dash.data.Operator,20);
     Serial.println("GET OPERATOR: ");
-    Serial.println(GSM.getOperator());
+    Serial.println(m_strOperator);
 
     // Serial.println("Del Old SMS");
     // GSM.delAllSms(); // this is optional
@@ -208,20 +216,19 @@ void loop()
     if (taskA.previous == 0 || (millis() - taskA.previous > taskA.rate))
     {
         taskA.previous = millis();
-        if (dash.data.Pumpenzustand)
-        {
-   	        dash.data.aktuelleLaufzeit = millis() / 1000;
-        }
-        dash.data.Temperatur = -999;
 
         if (dash.data.ModulQuery)
         {
             digitalWrite(LED_PIN, LOW); // LED einschalten
             dash.data.ModulQuery = false;
+            m_strOperator = GSM.getOperator();
+            m_strOperator.toCharArray(dash.data.Operator,20);
             Serial.println("GET OPERATOR: ");
-            Serial.println(GSM.getOperator());
-            Serial.println("GET OPERATORS LIST: ");
-            Serial.println(GSM.getOperatorsList());
+            Serial.println(m_strOperator);
+            m_strSignalQuality = GSM.signalQuality();
+            m_strSignalQuality.toCharArray(dash.data.SignalStrength,30);
+            // Serial.println("GET OPERATORS LIST: ");
+            // Serial.println(GSM.getOperatorsList());
             Serial.println("GET PRODUCT INFO: ");
             Serial.println(GSM.getProductInfo());
             digitalWrite(LED_PIN, HIGH); // LED ausschalten
@@ -273,8 +280,31 @@ void loop()
                 digitalWrite(LED_PIN, HIGH); // LED ausschalten
             }
         }
-        GSM.ReadGSMData();
+
+        if ((dash.data.SleepMode) && (GSM.getSleepMode() == false))
+        {
+            digitalWrite(LED_PIN, LOW); // LED einschalten
+            Serial.printf("SleepMode setzen");
+            if (GSM.setSleepMode(true))
+                DiagManager.PushDiagData(msgFehler,"Sleepmode setzen ok");
+            else
+                DiagManager.PushDiagData(msgFehler,"Sleepmode setzen fehlerhaft");
+            digitalWrite(LED_PIN, HIGH); // LED ausschalten
+        }
+        if ((!dash.data.SleepMode) && (GSM.getSleepMode() == true))
+        {
+            digitalWrite(LED_PIN, LOW); // LED einschalten
+            Serial.printf("SleepMode zurücksetzen");
+            if (GSM.setSleepMode(false))
+                DiagManager.PushDiagData(msgFehler,"Sleepmode zurücksetzen OK");
+            else
+                DiagManager.PushDiagData(msgFehler,"Sleepmode zurücksetzen fehlerhaft");
+
+
+            digitalWrite(LED_PIN, HIGH); // LED ausschalten
+        }
     }
+    GSM.ReadGSMData();
 }
 
   
