@@ -3,11 +3,17 @@
 
 struct dashboardData
 {
-	uint16_t aktuelleLaufzeit;
-	float Temperatur;
+	bool ModulQuery;
+	bool SendSMS;
+	bool CheckSMS;
+	bool DeleteSMS;
+	char Operator[20];
+	char SignalStrength[30];
+	float BatteryVoltage;
+	float Capacity;
+	bool SleepMode;
 	bool Pumpenzustand;
 	bool PumpenAbschaltError;
-	bool RuntimeMonitor;
 	bool Testschalter;
 	bool QueryTest;
 	bool MessageTest;

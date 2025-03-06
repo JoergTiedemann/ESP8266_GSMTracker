@@ -1,16 +1,70 @@
 [
     {
-        "name": "aktuelleLaufzeit",
-        "label": "aktuelle Laufzeit [Sek]",
-        "type": "uint16_t",
+        "name": "ModulQuery",
+        "label": "Modul abfragen",
+        "type": "bool",
+        "direction": "control",
+        "buttontextOn": "Abfragen",
+        "display": "button"
+    },
+    {
+        "name": "SendSMS",
+        "label": "SMS Senden",
+        "type": "bool",
+        "direction": "control",
+        "buttontextOn": "Senden",
+        "display": "button"
+    },
+    {
+        "name": "CheckSMS",
+        "label": "SMS prüfen",
+        "type": "bool",
+        "direction": "control",
+        "buttontextOn": "Prüfen",
+        "display": "button"
+    },
+    {
+        "name": "DeleteSMS",
+        "label": "SMS auf Karte löschen",
+        "type": "bool",
+        "direction": "control",
+        "buttontextOn": "Löschen",
+        "display": "button"
+    },
+    {
+        "name": "Operator",
+        "label": "Netzbetreiber",
+        "type": "char",
+        "length": 20,
         "direction": "display"
     },
     {
-        "name": "Temperatur",
-        "label": "Temperatur [C]",
+        "name": "SignalStrength",
+        "label": "Signalstärke [dBm]",
+        "type": "char",
+        "length": 30,
+        "direction": "display"
+    },
+    {
+        "name": "BatteryVoltage",
+        "label": "Batterieladung [V]",
+        "type": "float",
+        "digits": 2,
+        "direction": "display"
+    },
+    {
+        "name": "Capacity",
+        "label": "Kapazität [%]",
         "type": "float",
         "digits": 1,
         "direction": "display"
+    },
+    {
+        "name": "SleepMode",
+        "label": "Stromsparmodus",
+        "type": "bool",
+        "direction": "control",
+        "display": "switch"
     },
     {
         "name": "Pumpenzustand",
@@ -30,13 +84,6 @@
         "styletrue": "red",
         "stylefalse": "green",
         "direction": "display"
-    },
-    {
-        "name": "RuntimeMonitor",
-        "label": "Laufzeitueberwachung aktivieren",
-        "type": "bool",
-        "direction": "control",
-        "display": "switch"
     },
     {
         "name": "Testschalter",

@@ -48,21 +48,23 @@
     },
     {
         "type": "header",
-        "text": "Configüberschrift"
+        "text": "Telefoneinstellungen"
     },
     {
-        "name": "MaxOnTime",
-        "label": "max Einschaltzeit [Sek]",
-        "type": "uint16_t",
-        "value": 300
+        "name": "DialNumber",
+        "label": "Telefonnummer",
+        "type": "char",
+        "length": 20,
+        "value": "01747318866"
     },
     {
-        "name": "WarnOnTime",
-        "label": "max Einschaltzeit bis Warnung [Sek]",
-        "type": "uint16_t",
-        "value": 120
+        "name": "SMSText",
+        "label": "SMS-Text",
+        "type": "char",
+        "length": 40,
+        "value": "Das ist eine Testsms vom SIM800L"
     },
-    {
+   {
         "name": "PumpeStatusEinLevel",
         "label": "Schwellenwert Pumpe Ein",
         "type": "uint16_t",
