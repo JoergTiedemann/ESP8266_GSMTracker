@@ -67,23 +67,19 @@
         "display": "switch"
     },
     {
-        "name": "Pumpenzustand",
+        "name": "ReInit",
+        "label": "Init von GSM Modul",
         "type": "bool",
-        "texttrue": "Ein",
-        "textfalse": "Aus",
-        "styletrue": "true",
-        "stylefalse": "gray",
-        "direction": "display"
+        "direction": "control",
+        "buttontextOn": "ReInit",
+        "display": "button"
     },
     {
-        "name": "PumpenAbschaltError",
-        "label": "Pumpenueberwachung",
+        "name": "GSMModulPower",
+        "label": "GSM Modul ein/aus",
         "type": "bool",
-        "texttrue": "Pumpe gesperrt",
-        "textfalse": "Pumpe freigegeben",
-        "styletrue": "red",
-        "stylefalse": "green",
-        "direction": "display"
+        "direction": "control",
+        "display": "switch"
     },
     {
         "name": "Testschalter",

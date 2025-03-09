@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "config.h"
 
-uint32_t configVersion = 2539015658; //generated identifier to compare config with EEPROM
+uint32_t configVersion = 1305295835; //generated identifier to compare config with EEPROM
 
 const configData defaults PROGMEM =
 {
@@ -14,8 +14,8 @@ const configData defaults PROGMEM =
 	"de",
 	"01747318866",
 	"Das ist eine Testsms vom SIM800L",
+	false,
 	200,
-	true,
 	15000,
 	"",
 	false,

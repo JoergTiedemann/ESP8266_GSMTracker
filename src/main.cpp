@@ -28,6 +28,8 @@
 #define RX  14 //D5
 #define TX  12 // D6
 #define LED_PIN 2 // D4 ist GPIO 2
+#define LED_PIN 2 // D4 ist GPIO 2
+#define GSMPOWER_PIN 13 // D7 ist GPIO 13
 
 Sim800L GSM(RX, TX);
 
@@ -38,7 +40,7 @@ String strTime("No Time");
 String strBootTime("");
 String m_strOperator = "No Operator";
 String m_strSignalQuality = "";
-
+bool m_bGSMPowerState = false;
 
 uint32_t m_FreeHeap =0;
 bool b1 = false;
@@ -60,11 +62,100 @@ void saveCallback() {
 }
 
 
+void GSMInit()
+{
+    // GSM.begin(9600);
+    // GSM.setDebugLevel(cSeriellDebug);     
+    delay(2000);    
+    // Echo ausschalten
+    if (configManager.data.SerialDebug > 0)
+        GSM.setDebugLevel(cSeriellDebug);
+    else
+        GSM.setDebugLevel(cNoDebug);
+
+    // wir schauen zunächst mal das das Modem auf AT Befehle reagiert
+    String str = "";
+    bool bReaktion = false;
+    uint64_t startVersuchszeit = millis();
+    while (!bReaktion)
+    {
+        GSM.printSerial("AT\r");
+        uint64_t startTime = millis();
+        while ((str.indexOf("OK")) == -1)
+        {
+            if (millis() - startTime > 500) {
+             Serial.println("Timeout beim Warten auf OK");
+             break; // Timeout erreicht, Schleife verlassen
+            }
+        str += GSM._readSerial(500);
+        }
+        if ((str.indexOf("OK")) != -1)
+            bReaktion = true;
+        if (millis() - startVersuchszeit > 10000)
+        {
+            Serial.println("GSM Modul reagiert nicht auf AT Befehle");
+            return;
+        }
+    }
+    Serial.printf("bReaktion:%d\n",bReaktion);
+
+    Serial.println("Echo ausschalten: ATE0");
+    GSM.sendATCommand("ATE0",10000);
+    GSM.EnableEinbuchungsmessage(true);
+
+    GSM.prepareForSmsReceive();
+
+}
+
 void setup() 
 {
     Serial.begin(115200);
     BoardInformation.PrintBoardInformation();
     BoardInformation.print_used_libraries();
+
+    String resetReason = ESP.getResetReason();
+    Serial.println("Resetgrund: " + resetReason);
+    Serial.println("===========================");
+    struct rst_info *resetInfo = system_get_rst_info();
+    Serial.print("Resetgrund: ");
+    Serial.println(resetInfo->reason);
+    Serial.print("Exccause: ");
+    Serial.println(resetInfo->exccause);
+    Serial.print("Epcr: ");
+    Serial.println(resetInfo->epc1);
+    // Interpretieren des exccause-Werts
+    switch (resetInfo->exccause) {
+        case 0:
+            Serial.println("Illegal Instruction");
+            break;
+        case 1:
+            Serial.println("Syscall");
+            break;
+        case 2:
+            Serial.println("Instruction Fetch Error");
+            break;
+        case 3:
+            Serial.println("Load Store Error");
+            break;
+        case 4:
+            Serial.println("Level 1 Interrupt");
+            break;
+        case 5:
+            Serial.println("Alloca");
+            break;
+        case 6:
+            Serial.println("Integer Divide by Zero");
+            break;
+        case 7:
+            Serial.println("PC Alignment");
+            break;
+        case 8:
+            Serial.println("Data Alignment");
+            break;
+        default:
+            Serial.println("Unknown Exception");
+            break;
+    }
 
 
     LittleFS.begin();
@@ -132,30 +223,13 @@ void setup()
 
     pinMode(LED_PIN, OUTPUT); // LED-Pin als Ausgang setzen
     digitalWrite(LED_PIN, HIGH); // LED ausschalten
-
+    pinMode(GSMPOWER_PIN, OUTPUT); // LED-Pin als Ausgang setzen
+    digitalWrite(GSMPOWER_PIN, HIGH); // GSM abschalten
+    m_bGSMPowerState = false;
+    dash.data.GSMModulPower = true;
     GSM.begin(9600);
-    // GSM.setDebugLevel(cSeriellDebug);     
-    // Echo ausschalten
-    Serial.println("Echo ausschalten: ATE0");
-    GSM.sendATCommand("ATE0");
-    GSM.EnableEinbuchungsmessage(true);
+    // GSMInit();
 
-    Serial.println("GET PRODUCT INFO: ");
-    Serial.println(GSM.getProductInfo());
-  
-
-    m_strOperator = GSM.getOperator();
-    m_strOperator.toCharArray(dash.data.Operator,20);
-    Serial.println("GET OPERATOR: ");
-    Serial.println(m_strOperator);
-
-    // Serial.println("Del Old SMS");
-    // GSM.delAllSms(); // this is optional
-    GSM.prepareForSmsReceive();
-    // while(!GSM.prepareForSmsReceive())
-    // {
-    //   delay(1000);
-    // }
     Serial.println("ready");
 
 }
@@ -254,7 +328,16 @@ void loop()
             GSM.delAllSms(); // this is optional
             digitalWrite(LED_PIN, HIGH); // LED ausschalten
         }
-        
+
+        if (dash.data.ReInit)
+        {
+            digitalWrite(LED_PIN, LOW); // LED einschalten
+            Serial.printf("ReInit durchführen");
+            dash.data.ReInit  = false;
+            GSMInit();
+            digitalWrite(LED_PIN, HIGH); // LED ausschalten
+        }
+
 
         if (dash.data.CheckSMS)
         {
@@ -300,9 +383,27 @@ void loop()
             else
                 DiagManager.PushDiagData(msgFehler,"Sleepmode zurücksetzen fehlerhaft");
 
-
             digitalWrite(LED_PIN, HIGH); // LED ausschalten
         }
+
+        if ((dash.data.GSMModulPower) && (m_bGSMPowerState == false))
+        {
+            digitalWrite(GSMPOWER_PIN, HIGH); // GSM-Modul einschalten
+            Serial.printf("GSM-Modul eingeschaltet\n");
+            DiagManager.PushDiagData(msgFehler,"GSM-Modul eingeschaltet");
+            m_bGSMPowerState = true;
+            GSM.WaitForSMSCallReady();
+            GSMInit();
+        }
+        else  if ((dash.data.GSMModulPower == false) && (m_bGSMPowerState == true))
+
+        {
+            digitalWrite(GSMPOWER_PIN, LOW); // GSM-Modul abschalten
+            Serial.printf("GSM-Modul abgeschaltet\n");
+            m_bGSMPowerState = false;
+            DiagManager.PushDiagData(msgFehler,"GSM-Modul abgeschaltet");
+        }
+
     }
     GSM.ReadGSMData();
 }

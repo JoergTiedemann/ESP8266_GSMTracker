@@ -12,8 +12,8 @@ struct configData
 	char language[3];
 	char DialNumber[20];
 	char SMSText[40];
+	bool SerialDebug;
 	uint16_t PumpeStatusEinLevel;
-	bool ZeitCheckInit;
 	uint16_t FirebaseUpdateIntervall;
 	char PrivateKeyFirst[4];
 	bool ConnectToCloud;

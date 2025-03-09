@@ -260,11 +260,13 @@ String Sim800L::getOperatorsList()
 }
 
 void Sim800L::EnableEinbuchungsmessage(bool bEnable)
-{
+{   
     if (bEnable)
        printSerial("AT+CREG=1\r");// Meldung bei Änderung des Nestzwerkstatus in Fora +CREG: x
     else
         printSerial("AT+CREG=0\r");// KEINE Meldung bei Änderung des Nestzwerkstatus in Fora +CREG: x
+
+    _buffer = "";
     WaitForOk(_buffer);
 }
 
@@ -517,10 +519,11 @@ void  Sim800L::callNumber(char* number)
     printSerial(F(";\r\n"));
 }
 
-void  Sim800L::sendATCommand(String strATcmd)
+void  Sim800L::sendATCommand(String strATcmd,uint64_t timeout)
 {
+    _buffer = "";
     printSerial(strATcmd+"\r");
-    WaitForOk(_buffer);
+    WaitForOk(_buffer,timeout);
 }
 
 
@@ -620,11 +623,37 @@ bool Sim800L::WaitForOk(String& str,uint64_t timeout)
         }
         str += _readSerial(500);
     }
-    if (_buffer.indexOf("CMGL") == -1)
+    if (_buffer.indexOf("OK") == -1)
         return false;
     else
         return true;
 }
+
+bool Sim800L::WaitForSMSCallReady(uint64_t timeout)
+{
+    String str = "";
+    uint64_t startTime = millis();
+    while (((str.indexOf("SMS Ready")) == -1) &&
+            ((str.indexOf("Call Ready")) == -1)
+          )
+    {
+        if (millis() - startTime > timeout) {
+            Serial.println("Timeout beim Warten auf SMS Ready und Call Ready");
+            break; // Timeout erreicht, Schleife verlassen
+        }
+        str += _readSerial(500);
+    }
+    if ((_buffer.indexOf("SMS Ready") == -1) &&
+        (_buffer.indexOf("Call Ready") == -1)
+       )
+        return false;
+    else
+    {
+        return true;
+        Serial.println("SMS Ready oder Call Ready gefunden");
+    }
+}
+
 
 const uint8_t Sim800L::checkForSMS()
 {

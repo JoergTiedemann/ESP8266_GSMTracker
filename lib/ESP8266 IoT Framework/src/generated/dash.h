@@ -12,8 +12,8 @@ struct dashboardData
 	float BatteryVoltage;
 	float Capacity;
 	bool SleepMode;
-	bool Pumpenzustand;
-	bool PumpenAbschaltError;
+	bool ReInit;
+	bool GSMModulPower;
 	bool Testschalter;
 	bool QueryTest;
 	bool MessageTest;

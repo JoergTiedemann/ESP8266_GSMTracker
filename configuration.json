@@ -64,17 +64,17 @@
         "length": 40,
         "value": "Das ist eine Testsms vom SIM800L"
     },
+    {
+        "name": "SerialDebug",        
+        "label": "GSM seriell debuggen",
+        "type": "bool",
+        "value": false
+    },
    {
         "name": "PumpeStatusEinLevel",
         "label": "Schwellenwert Pumpe Ein",
         "type": "uint16_t",
         "value": 200
-    },
-    {
-        "name": "ZeitCheckInit",        
-        "label": "Ueberwachung nach Neustart Ein",
-        "type": "bool",
-        "value": true
     },
     {
         "type": "separator"

@@ -93,10 +93,10 @@ private:
     String _longitude;
     String _latitude;
 
-    String _readSerial();
-    String _readSerial(uint32_t timeout);
 
 public:
+    String _readSerial();
+    String _readSerial(uint32_t timeout);
 
     uint8_t	RX_PIN;
     uint8_t TX_PIN;
@@ -154,11 +154,12 @@ public:
     void RTCtime(int *day,int *month, int *year,int *hour,int *minute, int *second);
     String dateNet();
     bool updateRtc(int utc);
-    void sendATCommand(String strATcmd);
+    void sendATCommand(String strATcmd,uint64_t timeout = 5000);
     void setDebugLevel(int level);
     // auslesen der seriellen Schnittstelle fom GSM Modem
     void ReadGSMData();
     bool WaitForOk(String& str,uint64_t timeout = 5000);
+    bool WaitForSMSCallReady(uint64_t timeout = 5000);
     void EnableEinbuchungsmessage(bool bEnable);
 
 
