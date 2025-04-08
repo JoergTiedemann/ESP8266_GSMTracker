@@ -1,3 +1,4 @@
 ESP32Async/ESPAsyncWebServer@3.6.0
 mobizt/FirebaseJson@^3.0.9
 paulstoffregen/Time@1.6.1
+wollewald/MPU9250_WE@^1.2.12

@@ -21,6 +21,7 @@
 #include "dashboard.h"
 #include "DiagManager.h"
 #include "BoardsInformation.h"
+#include "GyroManager.h"
 
 #include <Sim800L.h>
 #include <SoftwareSerial.h>               
@@ -28,11 +29,10 @@
 #define RX  14 //D5
 #define TX  12 // D6
 #define LED_PIN 2 // D4 ist GPIO 2
-#define LED_PIN 2 // D4 ist GPIO 2
 #define GSMPOWER_PIN 13 // D7 ist GPIO 13
 
 Sim800L GSM(RX, TX);
-
+CGyroManager GyroManager;
 
 char buffer [80];
 
@@ -207,6 +207,10 @@ void setup()
             }
         #endif
     }
+
+    GyroManager.begin();
+
+
     dash.begin(500);
     // OTAManager.begin();
 
@@ -221,14 +225,15 @@ void setup()
 
     m_strOperator.toCharArray(dash.data.Operator,20);
 
-    pinMode(LED_PIN, OUTPUT); // LED-Pin als Ausgang setzen
-    digitalWrite(LED_PIN, HIGH); // LED ausschalten
+    // pinMode(LED_PIN, OUTPUT); // LED-Pin als Ausgang setzen
+    // digitalWrite(LED_PIN, HIGH); // LED ausschalten
     pinMode(GSMPOWER_PIN, OUTPUT); // LED-Pin als Ausgang setzen
     digitalWrite(GSMPOWER_PIN, HIGH); // GSM abschalten
     m_bGSMPowerState = false;
     dash.data.GSMModulPower = true;
     GSM.begin(9600);
     // GSMInit();
+    GyroManager.InitWakeOnMotion();
 
     Serial.println("ready");
 
@@ -284,6 +289,7 @@ void loop()
     updater.loop();
     dash.loop();
     configManager.loop();
+    GyroManager.loop();
 
     //your code here
     //task A
@@ -293,7 +299,7 @@ void loop()
 
         if (dash.data.ModulQuery)
         {
-            digitalWrite(LED_PIN, LOW); // LED einschalten
+            // digitalWrite(LED_PIN, LOW); // LED einschalten
             dash.data.ModulQuery = false;
             m_strOperator = GSM.getOperator();
             m_strOperator.toCharArray(dash.data.Operator,20);
@@ -305,37 +311,37 @@ void loop()
             // Serial.println(GSM.getOperatorsList());
             Serial.println("GET PRODUCT INFO: ");
             Serial.println(GSM.getProductInfo());
-            digitalWrite(LED_PIN, HIGH); // LED ausschalten
+            // digitalWrite(LED_PIN, HIGH); // LED ausschalten
         }
 
         if (dash.data.SendSMS)
         {
-            digitalWrite(LED_PIN, LOW); // LED einschalten
+            // digitalWrite(LED_PIN, LOW); // LED einschalten
             Serial.printf("SMS Senden:%s\n",configManager.data.SMSText);
             dash.data.SendSMS = false;
             bool error = false; 					//to catch the response of sendSms
             error=GSM.sendSms(configManager.data.DialNumber,configManager.data.SMSText);
             Serial.printf("SendenSMS:%d\n",error);
-            digitalWrite(LED_PIN, HIGH); // LED ausschalten
+            // digitalWrite(LED_PIN, HIGH); // LED ausschalten
 
         }
 
         if (dash.data.DeleteSMS)
         {
-            digitalWrite(LED_PIN, LOW); // LED einschalten
+            // digitalWrite(LED_PIN, LOW); // LED einschalten
             Serial.printf("SMS loeschen");
             dash.data.DeleteSMS = false;
             GSM.delAllSms(); // this is optional
-            digitalWrite(LED_PIN, HIGH); // LED ausschalten
+            // digitalWrite(LED_PIN, HIGH); // LED ausschalten
         }
 
         if (dash.data.ReInit)
         {
-            digitalWrite(LED_PIN, LOW); // LED einschalten
+            // digitalWrite(LED_PIN, LOW); // LED einschalten
             Serial.printf("ReInit durchführen");
             dash.data.ReInit  = false;
             GSMInit();
-            digitalWrite(LED_PIN, HIGH); // LED ausschalten
+            // digitalWrite(LED_PIN, HIGH); // LED ausschalten
         }
 
 
@@ -347,7 +353,7 @@ void loop()
             if(index != 0)
             {
                 Serial.printf("SMS Empfangen an Index:%d\n",index);
-                digitalWrite(LED_PIN, LOW); // LED einschalten
+                // digitalWrite(LED_PIN, LOW); // LED einschalten
                 // textSms=GSM.readSms(1); //read the first sms
         
                 // if (textSms.indexOf("OK")!=-1) //first we need to know if the messege is correct. NOT an ERROR
@@ -360,31 +366,48 @@ void loop()
                 Serial.printf("Empfangene SMS:%s von:%s vom:%s\n",smstext.c_str(),strNumber.c_str(),strDate.c_str());
                 DiagManager.PushDiagData(msgAll,"Empfangene SMS:%s von:%s vom:%s\n",smstext.c_str(),strNumber.c_str(),strDate.c_str());
                 // GSM.delAllSms(); // this is optional
-                digitalWrite(LED_PIN, HIGH); // LED ausschalten
+                // digitalWrite(LED_PIN, HIGH); // LED ausschalten
             }
         }
 
         if ((dash.data.SleepMode) && (GSM.getSleepMode() == false))
         {
-            digitalWrite(LED_PIN, LOW); // LED einschalten
+            // digitalWrite(LED_PIN, LOW); // LED einschalten
             Serial.printf("SleepMode setzen");
             if (GSM.setSleepMode(true))
                 DiagManager.PushDiagData(msgFehler,"Sleepmode setzen ok");
             else
                 DiagManager.PushDiagData(msgFehler,"Sleepmode setzen fehlerhaft");
-            digitalWrite(LED_PIN, HIGH); // LED ausschalten
+            // digitalWrite(LED_PIN, HIGH); // LED ausschalten
         }
         if ((!dash.data.SleepMode) && (GSM.getSleepMode() == true))
         {
-            digitalWrite(LED_PIN, LOW); // LED einschalten
+            // digitalWrite(LED_PIN, LOW); // LED einschalten
             Serial.printf("SleepMode zurücksetzen");
             if (GSM.setSleepMode(false))
                 DiagManager.PushDiagData(msgFehler,"Sleepmode zurücksetzen OK");
             else
                 DiagManager.PushDiagData(msgFehler,"Sleepmode zurücksetzen fehlerhaft");
 
-            digitalWrite(LED_PIN, HIGH); // LED ausschalten
+            // digitalWrite(LED_PIN, HIGH); // LED ausschalten
         }
+        if ((GyroManager.isMotionDetected()) && (dash.data.GSMModulPower == false))
+        {
+            // digitalWrite(LED_PIN, LOW); // LED einschalten
+            Serial.printf("Bewegung erkannt\n");
+            dash.data.GSMModulPower = true;
+            DiagManager.PushDiagData(msgAll,"Bewegung erkannt");
+        }
+        if (dash.data.StartMotionDetection)
+        {
+            // digitalWrite(LED_PIN, LOW); // LED einschalten
+            Serial.printf("Bewegungserkennung starten\n");
+            dash.data.StartMotionDetection = false;
+            DiagManager.PushDiagData(msgAll,"Bewegungserkennung gestartet");
+            GyroManager.ResetMotion();
+            dash.data.GSMModulPower = false;
+        }	
+
 
         if ((dash.data.GSMModulPower) && (m_bGSMPowerState == false))
         {

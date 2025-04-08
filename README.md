@@ -77,3 +77,16 @@ Das wird in der package.jspon angegeben
 # Funktion GPS Tracker 
 Die Version 1.0 ist ein nacktes System ohne Funktion in dem nur der Webserver mit dem maakbas IOT Framework gestartet wird
 Damit hat man dann erstmal alles was man braucht um mit einem leeren System mit Webservergrundfunktion loszulegen
+## Übersicht über die GPIO's
+Der Interruppin des Gyrosensors ist auf GPIO15 D8 festgelegt. Der Pin ist High wenn eine Bewegung erkannt wurde und schalten dann den MOSFet für das GSM Modul ein
+Für das GSM Modul brauchen wir für SofwareSerial die Pins GPIO14 D5 für RX und GPIO12 D6 für TX
+Für das Gyromodul brauchen wir I2C GPIO4 D2 (SDA) und GPIO5 D1 (SCL)  
+GPIO16 D0 wird vermutlich für den Wakeup from DeepSleep gebraucht
+
+Damit sind belegt D1+D2 (Kommunikation I2C Gyro), D5+D6 (Sofwareserial zum GSM), D8 Interrrupt Pin für Sutdown via MosFet, D0 für Wake from DeepSleep
+
+GPIO13 D7 ist noch frei für Input und Output -> werden wir für das GPS Modul brauchen
+GPIO2 D4 als Output ist noch frei -> werden wir für das GPS Modul brauchen
+GPIO0 D3 als Output ist noch frei -> werden wir für das GPS Modul brauchen
+
+sollte also passen

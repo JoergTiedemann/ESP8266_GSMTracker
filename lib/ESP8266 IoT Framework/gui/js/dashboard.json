@@ -90,6 +90,14 @@
         "display": "switch"
     },
     {
+        "name": "StartMotionDetection",
+        "label": "Bewegungssensor",
+        "type": "bool",
+        "direction": "control",
+        "buttontextOn": "aktivieren",
+        "display": "button"
+    },
+    {
         "name": "QueryTest",
         "label": "Firebase Query Test",
         "type": "bool",
