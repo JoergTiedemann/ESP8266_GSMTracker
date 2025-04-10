@@ -116,7 +116,7 @@ void CGyroManager::InitWakeOnMotion()
   /*  If latch is enabled the interrupt pin level is held until the interrupt status 
    *  is cleared. If latch is disabled the interrupt pulse is ~50µs (default).
    */
-  myMPU9250.enableIntLatch(true);
+  myMPU9250.enableIntLatch(false);//true);
    /*  The interrupt can be cleared by any read or it will only be cleared if the interrupt 
    *  status register is read (default).
    */

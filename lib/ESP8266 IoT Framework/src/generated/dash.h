@@ -16,6 +16,7 @@ struct dashboardData
 	bool GSMModulPower;
 	bool Testschalter;
 	bool StartMotionDetection;
+	bool GotoDeepSleep;
 	bool QueryTest;
 	bool MessageTest;
 	bool AltdatenLoeschen;

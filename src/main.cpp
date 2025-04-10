@@ -225,8 +225,8 @@ void setup()
 
     m_strOperator.toCharArray(dash.data.Operator,20);
 
-    // pinMode(LED_PIN, OUTPUT); // LED-Pin als Ausgang setzen
-    // digitalWrite(LED_PIN, HIGH); // LED ausschalten
+    pinMode(LED_PIN, OUTPUT); // LED-Pin als Ausgang setzen
+    digitalWrite(LED_PIN, HIGH); // LED ausschalten
     pinMode(GSMPOWER_PIN, OUTPUT); // LED-Pin als Ausgang setzen
     digitalWrite(GSMPOWER_PIN, HIGH); // GSM abschalten
     m_bGSMPowerState = false;
@@ -426,6 +426,15 @@ void loop()
             m_bGSMPowerState = false;
             DiagManager.PushDiagData(msgFehler,"GSM-Modul abgeschaltet");
         }
+        if (dash.data.GotoDeepSleep)
+        {
+            digitalWrite(LED_PIN, LOW); // LED einschalten
+            Serial.printf("Modul für 2 Sek in Deep Sleep setzen");
+            dash.data.GotoDeepSleep  = false;
+            // digitalWrite(LED_PIN, HIGH); // LED ausschalten
+            ESP.deepSleep(0); // 4 Sekunden
+        }
+
 
     }
     GSM.ReadGSMData();

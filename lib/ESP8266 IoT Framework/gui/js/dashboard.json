@@ -78,8 +78,7 @@
         "name": "GSMModulPower",
         "label": "GSM Modul ein/aus",
         "type": "bool",
-        "direction": "control",
-        "display": "switch"
+        "direction": "display"
     },
     {
         "name": "Testschalter",
@@ -97,6 +96,15 @@
         "buttontextOn": "aktivieren",
         "display": "button"
     },
+    {
+        "name": "GotoDeepSleep",
+        "label": "Deep Sleep",
+        "type": "bool",
+        "direction": "control",
+        "buttontextOn": "Sleep",
+        "display": "button"
+    },
+
     {
         "name": "QueryTest",
         "label": "Firebase Query Test",
